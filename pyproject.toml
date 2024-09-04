@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "obsidian_boy"
+version = "0.1.0"
+description = "An Obsidian AI assistant"
+authors = ["Olaf Geibig <olaf@pobox.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<=3.13"
+langchain = "^0.2.16"
+langgraph = "^0.2.16"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

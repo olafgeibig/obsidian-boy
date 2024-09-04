@@ -1,0 +1,64 @@
+@startuml
+class ObsidianBoy {
+  +run()
+  -define_workflow()
+  -execute_workflow()
+}
+class FileSystemInterface {
+  +list_daily_notes()
+  +read_daily_note()
+  +create_temp_note()
+  +update_note()
+  +get_existing_tags()
+  +move_temp_to_vault()
+}
+class DailyNoteProcessor {
+  +extract_entries()
+}
+abstract class Researcher {
+  {abstract} +research_entry()
+}
+class GPTResearcherImplementation {
+  +research_entry()
+}
+class NoteCreator {
+  +create_note()
+}
+class NoteTagger {
+  +tag_note()
+  +extract_existing_tags()
+}
+class DistilledNoteUpdater {
+  +update_distilled_note()
+}
+class AIReviewLoop {
+  +review_content()
+  +provide_feedback()
+  +refine_content()
+}
+class HumanReviewInterface {
+  +review_new_notes()
+  +review_note_changes()
+}
+class DiffGenerator {
+  +generate_diff()
+}
+class TerminalInterface {
+  +display_menu()
+  +get_user_input()
+  +show_daily_notes()
+  +select_daily_notes()
+}
+
+ObsidianBoy --> FileSystemInterface
+ObsidianBoy --> DailyNoteProcessor
+ObsidianBoy --> Researcher
+Researcher <|-- GPTResearcherImplementation
+ObsidianBoy --> NoteCreator
+ObsidianBoy --> NoteTagger
+ObsidianBoy --> DistilledNoteUpdater
+ObsidianBoy --> AIReviewLoop
+ObsidianBoy --> HumanReviewInterface
+ObsidianBoy --> TerminalInterface
+ObsidianBoy --> DiffGenerator
+@enduml
