@@ -11,10 +11,12 @@ def fs_interface(tmp_path):
     return FileSystemInterface(vault_path, temp_dir)
 
 def test_list_daily_notes(fs_interface):
-    # Create some test notes
-    (fs_interface.vault_path / "2023-05-01.md").touch()
-    (fs_interface.vault_path / "2023-05-02.md").touch()
-    (fs_interface.vault_path / "2023-05-03.md").touch()
+    # Create Daily directory and some test notes
+    daily_dir = fs_interface.vault_path / "Daily"
+    daily_dir.mkdir()
+    (daily_dir / "2023-05-01.md").touch()
+    (daily_dir / "2023-05-02.md").touch()
+    (daily_dir / "2023-05-03.md").touch()
 
     notes = fs_interface.list_daily_notes()
     assert len(notes) == 3

@@ -14,7 +14,8 @@ class FileSystemInterface:
         Returns:
             List[Path]: A list of paths to daily notes, sorted by date (newest first).
         """
-        daily_notes = list(self.vault_path.glob("*.md"))
+        daily_notes_dir = self.vault_path / "Daily"
+        daily_notes = list(daily_notes_dir.glob("*.md"))
         return sorted(daily_notes, key=lambda x: x.stem, reverse=True)
 
     def read_daily_note(self, note_path: Path) -> str:
