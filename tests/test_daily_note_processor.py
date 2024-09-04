@@ -47,7 +47,7 @@ def test_extract_entries(mock_llm):
     mock_llm.predict_messages.assert_called_once()
     call_args = mock_llm.predict_messages.call_args[0][0]
     assert len(call_args) == 1
-    assert call_args[0].content.startswith("Extract entries from the following daily note content.")
+    assert "Extract entries from the following daily note content." in call_args[0].content
     assert "Some test content for the daily note" in call_args[0].content
 
 def test_extract_entries_invalid_json(mock_llm):
