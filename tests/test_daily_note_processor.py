@@ -1,0 +1,67 @@
+import pytest
+from unittest.mock import Mock
+from langchain.schema import AIMessage
+from obsidian_boy.daily_note_processor import DailyNoteProcessor, Entry
+
+@pytest.fixture
+def mock_llm():
+    mock = Mock()
+    mock.predict_messages.return_value = AIMessage(content='''
+    [
+        {
+            "title": "Test Entry",
+            "link": "https://example.com",
+            "description": "This is a test entry",
+            "tags": ["test", "example"],
+            "todo": "Complete the test"
+        },
+        {
+            "link": "https://another-example.com",
+            "description": "This is another test entry"
+        }
+    ]
+    ''')
+    return mock
+
+def test_extract_entries(mock_llm):
+    processor = DailyNoteProcessor(mock_llm)
+    note_content = "Some test content for the daily note"
+    
+    entries = processor.extract_entries(note_content)
+    
+    assert len(entries) == 2
+    
+    assert entries[0] == Entry(
+        title="Test Entry",
+        link="https://example.com",
+        description="This is a test entry",
+        tags=["test", "example"],
+        todo="Complete the test"
+    )
+    
+    assert entries[1] == Entry(
+        link="https://another-example.com",
+        description="This is another test entry"
+    )
+    
+    mock_llm.predict_messages.assert_called_once()
+    call_args = mock_llm.predict_messages.call_args[0][0]
+    assert len(call_args) == 1
+    assert call_args[0].content.startswith("Extract entries from the following daily note content.")
+    assert "Some test content for the daily note" in call_args[0].content
+
+def test_extract_entries_invalid_json(mock_llm):
+    mock_llm.predict_messages.return_value = AIMessage(content="Invalid JSON")
+    processor = DailyNoteProcessor(mock_llm)
+    
+    entries = processor.extract_entries("Some content")
+    
+    assert entries == []
+
+def test_extract_entries_exception(mock_llm):
+    mock_llm.predict_messages.side_effect = Exception("Test exception")
+    processor = DailyNoteProcessor(mock_llm)
+    
+    entries = processor.extract_entries("Some content")
+    
+    assert entries == []
