@@ -24,10 +24,17 @@ def main():
     terminal_interface = TerminalInterface(fs_interface=fs_interface)
 
     # Initialize the daily note processor with the Anthropic Chat model
-    API_KEY = os.getenv("ANTHROPIC_API_KEY")
-    llm = ChatAnthropic(
-        model="claude-3-5-sonnet-20240620", 
-        api_key=API_KEY, 
+    API_KEY = os.getenv("DEEPSEEK_API_KEY")
+    # API_KEY = os.getenv("ANTHROPIC_API_KEY")
+    # llm = ChatAnthropic(
+    #     model="claude-3-5-sonnet-20240620", 
+    #     api_key=API_KEY, 
+    #     temperature=0.0
+    # )
+    llm = ChatOpenAI(
+        model="deepseek-chat", 
+        api_key=API_KEY,
+        base_url="https://api.deepseek.com/v1", 
         temperature=0.0
     )
     daily_note_processor = DailyNoteProcessor(llm=llm)
