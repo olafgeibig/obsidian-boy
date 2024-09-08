@@ -15,11 +15,22 @@ class FileSystemInterface {
 class DailyNoteProcessor {
   +extract_entries()
 }
-abstract class Researcher {
-  {abstract} +research_entry()
-}
-class GPTResearcherImplementation {
+class GenericResearcher {
   +research_entry()
+}
+class WebScraper {
+  +scrape()
+}
+abstract class KnowledgeBase {
+  {abstract} +store()
+  {abstract} +retrieve()
+}
+class FileSystemKnowledgeBase {
+  +store()
+  +retrieve()
+}
+class ContentProcessor {
+  +prepare_context()
 }
 class NoteCreator {
   +create_note()
@@ -52,13 +63,16 @@ class TerminalInterface {
 
 ObsidianBoy --> FileSystemInterface
 ObsidianBoy --> DailyNoteProcessor
-ObsidianBoy --> Researcher
-Researcher <|-- GPTResearcherImplementation
+ObsidianBoy --> GenericResearcher
+GenericResearcher --> WebScraper
+GenericResearcher --> KnowledgeBase
+KnowledgeBase <|-- FileSystemKnowledgeBase
+GenericResearcher --> ContentProcessor
 ObsidianBoy --> NoteCreator
 ObsidianBoy --> NoteTagger
 ObsidianBoy --> DistilledNoteUpdater
 ObsidianBoy --> AIReviewLoop
 ObsidianBoy --> HumanReviewInterface
 ObsidianBoy --> TerminalInterface
-ObsidianBoy --> DiffGenerator
+HumanReviewInterface --> DiffGenerator
 @enduml
