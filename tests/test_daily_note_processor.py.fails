@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 from langchain.schema import AIMessage
-from obsidian_boy.daily_note_processor import DailyNoteProcessor, Entry
+from obsidian_boy.daily_note_processor import DailyNoteProcessor, DailyNoteEntry
 
 @pytest.fixture
 def mock_llm():
@@ -31,7 +31,7 @@ def test_extract_entries(mock_llm):
     
     assert len(entries) == 2
     
-    assert entries[0] == Entry(
+    assert entries[0] == DailyNoteEntry(
         title="Test Entry",
         link="https://example.com",
         description="This is a test entry",
@@ -39,7 +39,7 @@ def test_extract_entries(mock_llm):
         todo="Complete the test"
     )
     
-    assert entries[1] == Entry(
+    assert entries[1] == DailyNoteEntry(
         link="https://another-example.com",
         description="This is another test entry"
     )
@@ -61,7 +61,8 @@ def test_extract_entries_invalid_json(mock_llm):
 def test_extract_entries_exception(mock_llm):
     mock_llm.predict_messages.side_effect = Exception("Test exception")
     processor = DailyNoteProcessor(mock_llm)
-    
+
     entries = processor.extract_entries("Some content")
-    
+
     assert entries == []
+    mock_llm.predict_messages.assert_called_once()
