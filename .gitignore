@@ -1,8 +1,11 @@
-.aider*
+.aider.tags*
+.aider.chat*
+.aider.input*
 .venv
 .benchmarks
 .vscode
 .DS_Store
 __pycache__
 .pytest_cache
-.env
+.env*
+.coverage

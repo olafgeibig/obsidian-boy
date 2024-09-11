@@ -4,6 +4,7 @@ from langchain.schema import HumanMessage
 import json
 import logging
 from pydantic import BaseModel, Field
+import markdownify
 
 # Define the Pydantic model for the daily note entry
 class DailyNoteEntry(BaseModel):
@@ -31,6 +32,9 @@ class DailyNoteProcessor:
         Returns:
             List[DailyNoteEntry]: A list of extracted entries.
         """
+        # Convert HTML content to Markdown
+        note_content = markdownify.markdownify(note_content)
+
         prompt = f"""
         Extract entries from the following daily note content. Each entry should have at least a title or a link, and may include a description, tags, and an optional todo item.
         Make sure to call the DailyNoteResponse function with the extracted entries.

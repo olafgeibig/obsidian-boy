@@ -1,0 +1,11 @@
+model: deepseek/deepseek-chat
+
+env-file: .env.aider
+cache-prompts: true
+cache-keepalive-pings: 5
+light-mode: true
+auto-commits: false
+test-cmd: pytest
+auto-test: true
+
+read: [docs/CONVENTIONS.md, docs/project.md]
