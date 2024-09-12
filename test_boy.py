@@ -4,7 +4,7 @@ from typing import List
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain.schema import HumanMessage
-from obsidian_boy.file_system_interface import FileSystemInterface
+from obsidian_boy.obsidian_interface import ObsidianInterface
 from obsidian_boy.terminal_interface import TerminalInterface
 from obsidian_boy.daily_note_processor import DailyNoteProcessor, DailyNoteEntry
 from obsidian_boy.web_scraper import WebScraper
@@ -28,7 +28,7 @@ def main():
     LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
     
     # Initialize the file system interface
-    fs_interface = FileSystemInterface(vault_path=VAULT_PATH, temp_dir=TEMP_DIR)
+    fs_interface = ObsidianInterface(vault_path=VAULT_PATH, temp_dir=TEMP_DIR)
 
     # Initialize the terminal interface
     terminal_interface = TerminalInterface(fs_interface=fs_interface)

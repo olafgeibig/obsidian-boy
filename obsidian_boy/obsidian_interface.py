@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List
 import shutil
 
-class FileSystemInterface:
+class ObsidianInterface:
     def __init__(self, vault_path: Path, temp_dir: Path):
         self.vault_path = vault_path
         self.temp_dir = temp_dir

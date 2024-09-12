@@ -1,10 +1,19 @@
 @startuml
 class ObsidianBoy {
+  -obsidian_interface: ObsidianInterface
+  -daily_note_processor: DailyNoteProcessor
+  -researcher: Researcher
+  -note_creator: NoteCreator
+  -note_tagger: NoteTagger
+  -distilled_note_updater: DistilledNoteUpdater
+  -ai_review_loop: AIReviewLoop
+  -human_review_interface: HumanReviewInterface
+  -terminal_interface: TerminalInterface
   +run()
   -define_workflow()
   -execute_workflow()
 }
-class FileSystemInterface {
+class ObsidianInterface {
   +list_daily_notes()
   +read_daily_note()
   +create_temp_note()
@@ -15,7 +24,9 @@ class FileSystemInterface {
 class DailyNoteProcessor {
   +extract_entries()
 }
-class GenericResearcher {
+class Researcher {
+  -web_scraper: WebScraper
+  -memory_manager: MemoryManager
   +research_entry()
 }
 class WebScraper {
@@ -29,7 +40,10 @@ class FileSystemKnowledgeBase {
   +store()
   +retrieve()
 }
-class ContentProcessor {
+class MemoryManager {
+  -knowledge_base: KnowledgeBase
+  +store_content()
+  +retrieve_content()
   +prepare_context()
 }
 class NoteCreator {
@@ -61,18 +75,18 @@ class TerminalInterface {
   +select_daily_notes()
 }
 
-ObsidianBoy --> FileSystemInterface
+ObsidianBoy --> ObsidianInterface
 ObsidianBoy --> DailyNoteProcessor
-ObsidianBoy --> GenericResearcher
-GenericResearcher --> WebScraper
-GenericResearcher --> KnowledgeBase
-KnowledgeBase <|-- FileSystemKnowledgeBase
-GenericResearcher --> ContentProcessor
+ObsidianBoy --> Researcher
 ObsidianBoy --> NoteCreator
 ObsidianBoy --> NoteTagger
 ObsidianBoy --> DistilledNoteUpdater
 ObsidianBoy --> AIReviewLoop
 ObsidianBoy --> HumanReviewInterface
 ObsidianBoy --> TerminalInterface
+Researcher --> WebScraper
+Researcher --> MemoryManager
+MemoryManager --> KnowledgeBase
+KnowledgeBase <|-- FileSystemKnowledgeBase
 HumanReviewInterface --> DiffGenerator
 @enduml

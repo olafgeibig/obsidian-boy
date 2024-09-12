@@ -27,11 +27,20 @@ Develop an AI-powered assistant (ObsidianBoy) that automates the process of mana
 ```plantuml
 @startuml
 class ObsidianBoy {
+  -obsidian_interface: ObsidianInterface
+  -daily_note_processor: DailyNoteProcessor
+  -researcher: Researcher
+  -note_creator: NoteCreator
+  -note_tagger: NoteTagger
+  -distilled_note_updater: DistilledNoteUpdater
+  -ai_review_loop: AIReviewLoop
+  -human_review_interface: HumanReviewInterface
+  -terminal_interface: TerminalInterface
   +run()
   -define_workflow()
   -execute_workflow()
 }
-class FileSystemInterface {
+class ObsidianInterface {
   +list_daily_notes()
   +read_daily_note()
   +create_temp_note()
@@ -42,7 +51,9 @@ class FileSystemInterface {
 class DailyNoteProcessor {
   +extract_entries()
 }
-class GenericResearcher {
+class Researcher {
+  -web_scraper: WebScraper
+  -memory_manager: MemoryManager
   +research_entry()
 }
 class WebScraper {
@@ -56,7 +67,10 @@ class FileSystemKnowledgeBase {
   +store()
   +retrieve()
 }
-class ContentProcessor {
+class MemoryManager {
+  -knowledge_base: KnowledgeBase
+  +store_content()
+  +retrieve_content()
   +prepare_context()
 }
 class NoteCreator {
@@ -88,26 +102,54 @@ class TerminalInterface {
   +select_daily_notes()
 }
 
-ObsidianBoy --> FileSystemInterface
+ObsidianBoy --> ObsidianInterface
 ObsidianBoy --> DailyNoteProcessor
-ObsidianBoy --> GenericResearcher
-GenericResearcher --> WebScraper
-GenericResearcher --> KnowledgeBase
-KnowledgeBase <|-- FileSystemKnowledgeBase
-GenericResearcher --> ContentProcessor
+ObsidianBoy --> Researcher
 ObsidianBoy --> NoteCreator
 ObsidianBoy --> NoteTagger
 ObsidianBoy --> DistilledNoteUpdater
 ObsidianBoy --> AIReviewLoop
 ObsidianBoy --> HumanReviewInterface
 ObsidianBoy --> TerminalInterface
+Researcher --> WebScraper
+Researcher --> MemoryManager
+MemoryManager --> KnowledgeBase
+KnowledgeBase <|-- FileSystemKnowledgeBase
 HumanReviewInterface --> DiffGenerator
 @enduml
 ```
 
+## Class Descriptions
+
+1. **ObsidianBoy**: The main orchestrator class. It creates and manages instances of all other components. It defines and executes the overall workflow using LangGraph.
+
+2. **ObsidianInterface**: Handles all interactions with the Obsidian vault file system.
+
+3. **DailyNoteProcessor**: Processes daily notes and extracts entries.
+
+4. **Researcher**: Orchestrates the research process for entries. It contains instances of WebScraper and MemoryManager.
+
+5. **WebScraper**: Responsible for scraping content from web resources.
+
+6. **KnowledgeBase**: Abstract base class for knowledge storage and retrieval.
+
+7. **FileSystemKnowledgeBase**: Concrete implementation of KnowledgeBase that stores data in the file system.
+
+8. **MemoryManager**: Manages the storage and retrieval of content, and prepares context for LLM processing. It has an instance of KnowledgeBase.
+
+9. **NoteCreator**, **NoteTagger**, **DistilledNoteUpdater**: Handle various aspects of note creation and management.
+
+10. **AIReviewLoop**: Implements the AI review feedback loop using LangGraph.
+
+11. **HumanReviewInterface**: Handles the human review process, including presenting diffs for approval.
+
+12. **DiffGenerator**: Generates diffs between original and updated notes.
+
+13. **TerminalInterface**: Manages all terminal-based user interactions.
+
 ## Implementation Tasks for Aider
 
-1. Implement FileSystemInterface class
+1. Implement ObsidianInterface class
    1. Implement method to list daily notes sorted by date
    2. Implement method to read daily notes from file system
    3. Implement method to create new notes in a temporary directory
@@ -136,11 +178,13 @@ HumanReviewInterface --> DiffGenerator
    1. Implement method to scrape content from a given URL
    2. Implement basic parsing logic to extract relevant information
 
-7. Implement ContentProcessor class
-   1. Implement method to prepare context from stored content for LLM processing
+7. Implement MemoryManager class
+   1. Implement method to store content using KnowledgeBase
+   2. Implement method to retrieve content from KnowledgeBase
+   3. Implement method to prepare context for LLM processing
 
-8. Implement GenericResearcher class
-   1. Integrate WebScraper, KnowledgeBase, and ContentProcessor
+8. Implement Researcher class
+   1. Integrate WebScraper and MemoryManager
    2. Implement research_entry method to orchestrate the research process
    3. Implement placeholder for LLM integration to extract section content
 
@@ -191,6 +235,7 @@ HumanReviewInterface --> DiffGenerator
     1. Write docstrings for all classes and methods
     2. Create a README.md with setup and usage instructions
 
+
 ## Notes for Aider
 
 - Task 1 (project setup) will be provided by the user
@@ -205,5 +250,5 @@ HumanReviewInterface --> DiffGenerator
 - For the AI review feedback loop, use LangGraph to create a multi-step review process that can iterate on content improvements
 - When implementing the WebScraper, consider using libraries like `requests` for HTTP requests and `beautifulsoup4` for HTML parsing
 - The KnowledgeBase abstraction allows for easy swapping of storage mechanisms in the future. Consider implementing a simple file-based storage first, with the option to extend to more complex systems later
-- When implementing the ContentProcessor, focus on preparing the context in a format that's easy for the LLM to process
-- In the GenericResearcher, ensure that the entry title is used as a prefix when storing content in the KnowledgeBase to avoid naming conflicts
+- When implementing the MemoryManager, focus on preparing the context in a format that's easy for the LLM to process
+- In the Researcher, ensure that the entry title is used as a prefix when storing content in the KnowledgeBase to avoid naming conflicts

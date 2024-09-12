@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-from obsidian_boy.file_system_interface import FileSystemInterface
+from obsidian_boy.obsidian_interface import ObsidianInterface
 
 @pytest.fixture
 def fs_interface(tmp_path):
@@ -8,7 +8,7 @@ def fs_interface(tmp_path):
     temp_dir = tmp_path / "temp"
     vault_path.mkdir()
     temp_dir.mkdir()
-    return FileSystemInterface(vault_path, temp_dir)
+    return ObsidianInterface(vault_path, temp_dir)
 
 def test_list_daily_notes(fs_interface):
     # Create Daily directory and some test notes

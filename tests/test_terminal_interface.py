@@ -2,11 +2,11 @@ import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 from obsidian_boy.terminal_interface import TerminalInterface
-from obsidian_boy.file_system_interface import FileSystemInterface
+from obsidian_boy.obsidian_interface import ObsidianInterface
 
 @pytest.fixture
 def mock_fs_interface():
-    return MagicMock(spec=FileSystemInterface)
+    return MagicMock(spec=ObsidianInterface)
 
 @pytest.fixture
 def terminal_interface(mock_fs_interface):

@@ -1,9 +1,9 @@
 from typing import List
 from pathlib import Path
-from .file_system_interface import FileSystemInterface
+from .obsidian_interface import ObsidianInterface
 
 class TerminalInterface:
-    def __init__(self, fs_interface: FileSystemInterface):
+    def __init__(self, fs_interface: ObsidianInterface):
         self.fs_interface = fs_interface
 
     def display_menu(self) -> None:
