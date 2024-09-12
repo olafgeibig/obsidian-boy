@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 from typing import Dict, Any, Optional
-from bs4 import BeautifulSoup
+import markdownify
 
 class WebScraper:
     name: str = "Read website content"
@@ -26,13 +26,13 @@ class WebScraper:
 
     def scrape(self, url: Optional[str] = None) -> str:
         """
-        Scrape content from a given URL and extract relevant information.
+        Scrape content from a given URL and convert it to Markdown.
 
         Args:
             url (Optional[str]): The URL to scrape. If not provided, uses the instance's website_url.
 
         Returns:
-            str: The extracted text content from the webpage.
+            str: The extracted text content from the webpage converted to Markdown.
         """
         website_url = url or self.website_url
         if not website_url:
@@ -49,11 +49,10 @@ class WebScraper:
             page.encoding = page.apparent_encoding
             self.soup = BeautifulSoup(page.text, "html.parser")
             
-            text = self.soup.get_text(separator='\n', strip=True)
-            text = '\n'.join([i for i in text.split('\n') if i.strip() != ''])
-            text = ' '.join([i for i in text.split(' ') if i.strip() != ''])
+            # Convert the scraped HTML content to Markdown
+            markdown_content = markdownify.markdownify(str(self.soup))
             
-            return text
+            return markdown_content
         except requests.RequestException as e:
             logging.error(f"Error scraping {website_url}: {str(e)}")
             return f"Error scraping {website_url}: {str(e)}"

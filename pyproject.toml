@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.12,<=3.13"
+python = ">=3.12,<3.13"
 langchain = "^0.2.16"
 langgraph = "^0.2.16"
 langchain-openai = "^0.1.23"
@@ -17,7 +17,9 @@ langchain-groq = "^0.1.9"
 langchain-anthropic = "^0.1.23"
 beautifulsoup4 = "^4.12.3"
 markdownify = "^0.13.1"
-
+arize-phoenix-otel = "^0.4.1"
+openinference-instrumentation-openai = "^0.1.14"
+openinference-instrumentation-langchain = "^0.1.28"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
@@ -28,6 +30,6 @@ pytest-cov = "^5.0.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.scripts]
+[tool.poe.scripts]
 mycov = "pytest --without-integration --cov=obsidian_boy"
 mytest = "pytest --without-integration"
