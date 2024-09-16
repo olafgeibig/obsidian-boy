@@ -1,4 +1,5 @@
-model: deepseek/deepseek-chat
+# model: deepseek/deepseek-chat
+sonnet: true
 
 env-file: .env.aider
 cache-prompts: true
