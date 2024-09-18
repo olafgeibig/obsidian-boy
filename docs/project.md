@@ -1,12 +1,15 @@
-# ObsidianBoy: Updated Project Plan
+# ObsidianBoy Project Plan
 
 ## Project Overview
 
-Develop an AI-powered assistant (ObsidianBoy) that automates the process of managing knowledge in Obsidian. The assistant will allow users to select daily notes to process, perform research on entries using a flexible research implementation, create new notes, tag them based on existing tags, and update distilled notes. It will use Anthropic's Claude API and include an AI review feedback loop using LangGraph, followed by a human review step before finalizing changes. The interface will be terminal-based.
+An AI-powered assistant (ObsidianBoy) that automates the process of managing knowledge in Obsidian. The goal is to transform daily note entries into compreghensive notes with full explanation and links to relevant resources. The assistant will allow users to select daily notes to process, perform research on entries using a flexible research implementation, create new notes, tag them based on existing tags, and update distilled notes. There shall be an AI review feedback loop, followed by a human review step before finalizing changes. The interface will be terminal-based.
+
+Obsidian background:
+Obsidian is a note taking app that stores the notes as markdown files in a vault. In Obsidian daily notes are like bookmarks of ideas or inspirations used to capture findings or ideas. Usually daily notes contain a title, a link to relevant resources and a description, probably also tags and a task to remind the user. Distilled notes are covering a bigger topic and are usually linking to detailled notes.
 
 ## Requirements
 
-1. List and allow selection of daily notes sorted by date
+1. List and allow selection of daily notes sorted by date.
 2. Process selected daily notes in Obsidian
 3. Extract entries from daily notes
 4. Perform research on each entry using web scraping and content analysis

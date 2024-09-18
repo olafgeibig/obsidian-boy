@@ -1,0 +1,23 @@
+@startuml
+start
+:get datetime of last execution. 
+Requires a persisted date of the last execution.;
+:get list of daily notes;
+:detect unprocessed daily notes  -> list;
+:for each unprocessed daily note, extract its entries;
+:store all extracted entries in a list -> entrylist;
+while (entries in entrylist?)
+  if (entry has missing mandatory fields?)
+    :research missing fields;
+    :update entry in the entrylist;
+  endif
+endwhile
+:load note_template;
+while (entries in entrylist)
+  while (fields in the note_template)
+    :
+  endwhile
+  :match entry data with the template;
+endwhile
+
+@enduml
