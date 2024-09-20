@@ -11,10 +11,14 @@ from obsidian_boy.web_scraper import WebScraper
 from dotenv import load_dotenv
 from phoenix.otel import register
 from openinference.instrumentation.openai import OpenAIInstrumentor
+from openinference.instrumentation.crewai import CrewAIInstrumentor
+
+from obsidian_boy.crew_notes import NoteCrew
 
 # Set the default vault path
 VAULT_PATH = Path(os.getenv('VAULT_PATH', './vault'))
 TEMP_DIR = Path('./temp')
+
 
 def main():
     # Load environment variables from .env file
@@ -26,6 +30,7 @@ def main():
     # OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
     from openinference.instrumentation.langchain import LangChainInstrumentor
     LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+    CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
     
     # Initialize the file system interface
     fs_interface = ObsidianInterface(vault_path=VAULT_PATH, temp_dir=TEMP_DIR)
@@ -34,20 +39,26 @@ def main():
     terminal_interface = TerminalInterface(fs_interface=fs_interface)
 
     # Initialize the daily note processor with the Anthropic Chat model
-    API_KEY = os.getenv("DEEPSEEK_API_KEY")
+
     # API_KEY = os.getenv("ANTHROPIC_API_KEY")
     # llm = ChatAnthropic(
     #     model="claude-3-5-sonnet-20240620", 
     #     api_key=API_KEY, 
     #     temperature=0.0
     # )
+    # API_KEY = os.getenv("DEEPSEEK_API_KEY")
+    # llm = ChatOpenAI(
+    #     model="deepseek-chat", 
+    #     api_key=API_KEY,
+    #     base_url="https://api.deepseek.com/v1", 
+    #     temperature=0.0
+    # )
     llm = ChatOpenAI(
-        model="deepseek-chat", 
-        api_key=API_KEY,
-        base_url="https://api.deepseek.com/v1", 
+        model="gpt-4o-mini", 
         temperature=0.0
     )
     daily_note_processor = DailyNoteProcessor(llm=llm)
+    note_crew = NoteCrew()
 
     # Display the menu and get user input
     terminal_interface.display_menu()
@@ -56,11 +67,13 @@ def main():
     # Process each selected note
     for note_path in selected_notes:
         note_content = fs_interface.read_daily_note(note_path)
-        entries = daily_note_processor.extract_entries(note_content)
+        # entries = daily_note_processor.extract_entries(note_content)
+        entries = note_crew.extract_entries(note_path)
+        print(entries.entries)
 
         # Display the extracted entries
         print(f"\nEntries extracted from {note_path.name}:")
-        for entry in entries:
+        for entry in entries.entries:
             print(f"Title: {entry.title}")
             print(f"Link: {entry.link}")
             print(f"Description: {entry.description}")

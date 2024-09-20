@@ -6,18 +6,41 @@ class ObsidianBoy {
   -note_creator: NoteCreator
   -note_tagger: NoteTagger
   -distilled_note_updater: DistilledNoteUpdater
-  -ai_review_loop: AIReviewLoop
   -human_review_interface: HumanReviewInterface
   -terminal_interface: TerminalInterface
   +run()
   -define_workflow()
   -execute_workflow()
 }
+class Note <<Pydantic>> {
+  Path location
+  String content
+  NoteStatus status
+}
+enum NoteStatus {
+  AI_CREATED
+  AI_UPDATED
+  AI_REJECTED
+  HUMAN_UPDATED
+  HUMAN_REJECTED 
+}
+class NoteReview <<Pydantic>> {
+  Note note
+  NoteReviewResult result
+  String Comment
+}
+enum NoteReviewResult {
+  APPROVED
+  REJECTED
+}
 class ObsidianInterface {
-  +list_daily_notes()
+  - VAULT_PATH
+  - TEMP_DIR
+  - DAILY_NOTE_DIR
+  + List[Path] : list_daily_notes()
   +read_daily_note()
   +create_temp_note()
-  +update_note()
+  +update_temp_note()
   +get_existing_tags()
   +move_temp_to_vault()
 }
@@ -81,7 +104,6 @@ ObsidianBoy --> Researcher
 ObsidianBoy --> NoteCreator
 ObsidianBoy --> NoteTagger
 ObsidianBoy --> DistilledNoteUpdater
-ObsidianBoy --> AIReviewLoop
 ObsidianBoy --> HumanReviewInterface
 ObsidianBoy --> TerminalInterface
 Researcher --> WebScraper
@@ -89,4 +111,3 @@ Researcher --> MemoryManager
 MemoryManager --> KnowledgeBase
 KnowledgeBase <|-- FileSystemKnowledgeBase
 HumanReviewInterface --> DiffGenerator
-@enduml
