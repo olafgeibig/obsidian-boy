@@ -1,113 +1,21 @@
 @startuml
-class ObsidianBoy {
-  -obsidian_interface: ObsidianInterface
-  -daily_note_processor: DailyNoteProcessor
-  -researcher: Researcher
-  -note_creator: NoteCreator
-  -note_tagger: NoteTagger
-  -distilled_note_updater: DistilledNoteUpdater
-  -human_review_interface: HumanReviewInterface
-  -terminal_interface: TerminalInterface
-  +run()
-  -define_workflow()
-  -execute_workflow()
-}
-class Note <<Pydantic>> {
-  Path location
-  String content
-  NoteStatus status
-}
-enum NoteStatus {
-  AI_CREATED
-  AI_UPDATED
-  AI_REJECTED
-  HUMAN_UPDATED
-  HUMAN_REJECTED 
-}
-class NoteReview <<Pydantic>> {
-  Note note
-  NoteReviewResult result
-  String Comment
-}
-enum NoteReviewResult {
-  APPROVED
-  REJECTED
-}
-class ObsidianInterface {
-  - VAULT_PATH
-  - TEMP_DIR
-  - DAILY_NOTE_DIR
-  + List[Path] : list_daily_notes()
-  +read_daily_note()
-  +create_temp_note()
-  +update_temp_note()
-  +get_existing_tags()
-  +move_temp_to_vault()
-}
-class DailyNoteProcessor {
-  +extract_entries()
-}
-class Researcher {
-  -web_scraper: WebScraper
-  -memory_manager: MemoryManager
-  +research_entry()
-}
-class WebScraper {
-  +scrape()
-}
-abstract class KnowledgeBase {
-  {abstract} +store()
-  {abstract} +retrieve()
-}
-class FileSystemKnowledgeBase {
-  +store()
-  +retrieve()
-}
-class MemoryManager {
-  -knowledge_base: KnowledgeBase
-  +store_content()
-  +retrieve_content()
-  +prepare_context()
-}
-class NoteCreator {
-  +create_note()
-}
-class NoteTagger {
-  +tag_note()
-  +extract_existing_tags()
-}
-class DistilledNoteUpdater {
-  +update_distilled_note()
-}
-class AIReviewLoop {
-  +review_content()
-  +provide_feedback()
-  +refine_content()
-}
-class HumanReviewInterface {
-  +review_new_notes()
-  +review_note_changes()
-}
-class DiffGenerator {
-  +generate_diff()
-}
-class TerminalInterface {
-  +display_menu()
-  +get_user_input()
-  +show_daily_notes()
-  +select_daily_notes()
-}
-
-ObsidianBoy --> ObsidianInterface
-ObsidianBoy --> DailyNoteProcessor
-ObsidianBoy --> Researcher
-ObsidianBoy --> NoteCreator
-ObsidianBoy --> NoteTagger
-ObsidianBoy --> DistilledNoteUpdater
-ObsidianBoy --> HumanReviewInterface
-ObsidianBoy --> TerminalInterface
-Researcher --> WebScraper
-Researcher --> MemoryManager
-MemoryManager --> KnowledgeBase
-KnowledgeBase <|-- FileSystemKnowledgeBase
-HumanReviewInterface --> DiffGenerator
+title: Processing Flow
+start
+:Parse a daily note into entries;
+:Fill the missing fields of the entries.
+Do research when needed.;
+:Create a note in the temp dir for each entry;
+:Choose a note template;
+:Write the note according to the template. 
+Do research when needed.;
+:Tag the daily note according to existing tags;
+repeat :Human reviews a note;
+  switch (human review is)
+  case (approved)
+    :Copy note to note dir;
+  case (rejected)
+    :Take the human feedback;
+    :Send to the note writer agent for correction;
+  endswitch  
+repeat while (new notes?) is (yes)
+@enduml

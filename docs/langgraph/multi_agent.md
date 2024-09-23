@@ -145,7 +145,23 @@ In this example, multiple agents are connected, but compared to above they do NO
 
 In this case, the independent agents are a LangGraph ReAct agent (graph). This means they have their own individual prompt, LLM, and tools. When called, it's not just a single LLM call, but rather an invocation of the graph powering the ReAct agent.
 
-![](./img/multi_agent/supervisor.png)
+```plantuml
+@startuml
+!include <C4/C4_Container>
+
+Person(user, "User")
+Container(supervisor, "Supervisor", "Routes to Agents")
+Container(agent1, "Agent 1", "Handles specific task")
+Container(agent2, "Agent 2", "Handles specific task")
+Container(agent3, "Agent 3", "Handles specific task")
+
+Rel(user, supervisor, "Request")
+Rel(supervisor, agent1, "route")
+Rel(supervisor, agent2, "route")
+Rel(supervisor, agent3, "route")
+
+@enduml
+```
 
 See full code example in this [tutorial](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/).
 
@@ -153,6 +169,40 @@ See full code example in this [tutorial](https://langchain-ai.github.io/langgrap
 
 What if the job for a single worker in agent supervisor example becomes too complex? What if the number of workers becomes too large? For some applications, the system may be more effective if work is distributed hierarchically. You can do this by creating additional level of subgraphs and creating a top-level supervisor, along with mid-level supervisors:
 
-![](./img/multi_agent/hierarchical.png)
+```plantuml
+@startuml
+!include <C4/C4_Container>
+
+Person(user, "User")
+Container(supervisor, "Supervisor", "Routes tasks")
+Container(research_team, "Research Team", "Coordinates research")
+Container(document_authoring, "Document Authoring", "Handles writing tasks")
+Container(searcher, "Searcher", "Performs searches")
+Container(web_scraper, "Web Scraper", "Scrapes data from web")
+Container(writer, "Writer", "Writes documents")
+Container(note_taker, "Note Taker", "Takes notes")
+Container(chart_generator, "Chart Generator", "Generates charts")
+
+Rel(user, supervisor, )
+Rel(supervisor, user,)
+Rel(supervisor, research_team, "Route")
+Rel(supervisor, document_authoring, "Route")
+Rel(research_team, supervisor, )
+Rel(document_authoring, supervisor, )
+
+Rel(research_team, searcher, "route")
+Rel(research_team, web_scraper, "route")
+Rel(searcher, research_team, )
+Rel(web_scraper, research_team, )
+
+Rel(document_authoring, writer, "route")
+Rel(document_authoring, note_taker, "route")
+Rel(document_authoring, chart_generator, "route")
+Rel(writer, document_authoring, )
+Rel(note_taker, document_authoring, )
+Rel(chart_generator, document_authoring, )
+
+@enduml
+```
 
 See full code example in this [tutorial](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/hierarchical_agent_teams/).
