@@ -4,7 +4,10 @@ import json
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 from pydantic import BaseModel
-
+from phoenix.otel import register
+from openinference.instrumentation.openai import OpenAIInstrumentor
+from openinference.instrumentation.crewai import CrewAIInstrumentor
+from litellm import litellm
 class Note(BaseModel):
     title: str
     content: str
@@ -12,10 +15,19 @@ class Note(BaseModel):
 
 
 load_dotenv()
+tracer_provider = register(
+project_name="obsidian-boy",
+endpoint="http://localhost:6006/v1/traces"
+)
+OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
+llm="openrouter/qwen/qwen-2.5-72b-instruct"
+print(litellm.get_supported_openai_params(llm))
+
 # os.environ["OPENAI_API_KEY"] = os.getenv("OPENROUTER_API_KEY")
 # os.environ["OPENAI_API_BASE"] = '"https://openrouter.ai/api/v1'
-os.environ["OPENAI_API_KEY"] = os.getenv("DEEPSEEK_API_KEY")
-os.environ["OPENAI_API_BASE"] = 'https://api.deepseek.com/v1'
+# os.environ["OPENAI_API_KEY"] = os.getenv("DEEPSEEK_API_KEY")
+# os.environ["OPENAI_API_BASE"] = 'https://api.deepseek.com/v1'
 # llm=ChatOpenAI(model="gpt-4o", temperature=0.7)
 # DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 # llm = ChatOpenAI(
@@ -39,7 +51,7 @@ writer_agent = Agent(
     goal='Write personal notes using a specified template.',
     backstory='I am a note writer with a great skill to write personal notes.',
     verbose=True,
-    llm="openai/deepseek-chat",
+    llm="openrouter/qwen/qwen-2.5-72b-instruct",
     allow_delegation=False,
     tools=[]
 )
