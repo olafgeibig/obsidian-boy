@@ -20,7 +20,7 @@ markdownify = "^0.13.1"
 arize-phoenix-otel = "^0.4.1"
 openinference-instrumentation-openai = "^0.1.14"
 openinference-instrumentation-langchain = "^0.1.28"
-crewai = {extras = ["tools"], version = "^0.61.0"}
+crewai = "^0.63.2"
 openinference-instrumentation-crewai = "^0.1.2"
 
 [tool.poetry.group.dev.dependencies]

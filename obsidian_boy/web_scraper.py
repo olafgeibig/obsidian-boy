@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Optional
 import markdownify
 
 class WebScraper:

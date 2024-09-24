@@ -1,18 +1,16 @@
-from typing import List, Optional
+from typing import List
 from langchain.chat_models.base import BaseChatModel
-from langchain.schema import HumanMessage
-import json
 import logging
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 import markdownify
-
+from .types import DailyNoteEntry
 # Define the Pydantic model for the daily note entry
-class DailyNoteEntry(BaseModel):
-    title: Optional[str] = Field(description="Entry title (optional)")
-    link: Optional[str] = Field(description="URL or markdown link (optional)")
-    description: Optional[str] = Field(description="Brief description of the entry (optional)")
-    tags: List[str] = Field(default_factory=list, description="List of tags (optional, default to empty list)")
-    todo: Optional[str] = Field(default=None, description="Optional todo item (null if not present)")
+# class DailyNoteEntry(BaseModel):
+#     title: Optional[str] = Field(description="Entry title (optional)")
+#     link: Optional[str] = Field(description="URL or markdown link (optional)")
+#     description: Optional[str] = Field(description="Brief description of the entry (optional)")
+#     tags: List[str] = Field(default_factory=list, description="List of tags (optional, default to empty list)")
+#     todo: Optional[str] = Field(default=None, description="Optional todo item (null if not present)")
 
 class DailyNoteResponse(BaseModel):
     entries: List[DailyNoteEntry]

@@ -1,11 +1,14 @@
 from pathlib import Path
 from typing import List
-import shutil
+from .types import Note
 
 class ObsidianInterface:
-    def __init__(self, vault_path: Path, temp_dir: Path):
-        self.vault_path = vault_path
-        self.temp_dir = temp_dir
+    def __init__(self, vault_path: Path):
+        self.VAULT_PATH = vault_path
+        self.NEW_NOTE_DIR = self.VAULT_PATH / "ObsidianBoy/New"
+        self.REVISION_DIR = self.VAULT_PATH / "ObsidianBoy/Revision"
+        self.NOTE_DIR = self.VAULT_PATH / "ObsidianBoy/Notes"
+        self.DAILY_NOTE_DIR = self.VAULT_PATH / "Daily"
 
     def list_daily_notes(self) -> List[Path]:
         """
@@ -14,46 +17,53 @@ class ObsidianInterface:
         Returns:
             List[Path]: A list of paths to daily notes, sorted by date (newest first).
         """
-        daily_notes_dir = self.vault_path / "Daily"
-        daily_notes = list(daily_notes_dir.glob("*.md"))
+        daily_notes = list(self.DAILY_NOTE_DIR.glob("*.md"))
         return sorted(daily_notes, key=lambda x: x.stem, reverse=True)
 
-    def read_daily_note(self, note_path: Path) -> str:
+    def read_daily_note(self, dailynote: Path) -> str:
         """
         Read the contents of a daily note.
 
         Args:
-            note_path (Path): The path to the daily note.
+            dailynote (Path): The path to the daily note.
 
         Returns:
             str: The contents of the daily note.
         """
-        return note_path.read_text(encoding="utf-8")
+        return dailynote.read_text(encoding="utf-8")
 
-    def create_temp_note(self, note_name: str, content: str) -> Path:
+    def create_note(self, note: Note) -> None:
         """
-        Create a new note in the temporary directory.
+        Create a new note in the NEW_NOTE_DIR.
 
         Args:
-            note_name (str): The name of the new note (without extension).
-            content (str): The content of the new note.
-
-        Returns:
-            Path: The path to the newly created temporary note.
+            note (Note): The Note object containing the note's information.
         """
-        temp_note_path = self.temp_dir / f"{note_name}.md"
-        temp_note_path.write_text(content, encoding="utf-8")
-        return temp_note_path
+        note_path = self.NEW_NOTE_DIR / f"{note.location.stem}.md"
+        note_path.write_text(note.content, encoding="utf-8")
+        note.location = note_path
 
-    def update_note(self, note_path: Path, content: str) -> None:
+    def update_note(self, note: Note, content: str) -> None:
         """
         Update an existing note with new content.
 
         Args:
-            note_path (Path): The path to the note to be updated.
+            note (Note): The Note object to be updated.
             content (str): The new content for the note.
         """
-        note_path.write_text(content, encoding="utf-8")
+        note.location.write_text(content, encoding="utf-8")
+
+    def move_note(self, note: Note, dir: Path) -> None:
+        """
+        Move a note to a new directory within the Obsidian vault.
+
+        Args:
+            note (Note): The Note object to be moved.
+            dir (Path): The directory to move the note to.
+        """
+        new_location = dir / note.location.name
+        note.location.rename(new_location)
+        note.location = new_location
 
     def get_existing_tags(self) -> List[str]:
         """
@@ -63,22 +73,7 @@ class ObsidianInterface:
             List[str]: A list of unique tags found in the vault.
         """
         tags = set()
-        for note in self.vault_path.glob("**/*.md"):
+        for note in self.VAULT_PATH.glob("**/*.md"):
             content = note.read_text(encoding="utf-8")
             tags.update(tag.strip("#") for tag in content.split() if tag.startswith("#"))
         return sorted(tags)
-
-    def move_temp_to_vault(self, temp_note_path: Path, destination_name: str) -> Path:
-        """
-        Move a file from the temporary directory to the Obsidian vault.
-
-        Args:
-            temp_note_path (Path): The path to the temporary note.
-            destination_name (str): The desired name for the note in the vault (without extension).
-
-        Returns:
-            Path: The path to the note in the Obsidian vault.
-        """
-        destination_path = self.vault_path / f"{destination_name}.md"
-        shutil.move(temp_note_path, destination_path)
-        return destination_path

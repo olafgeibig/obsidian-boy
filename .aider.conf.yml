@@ -9,4 +9,4 @@ auto-commits: false
 test-cmd: pytest
 auto-test: true
 
-read: [docs/CONVENTIONS.md, docs/plan.md]
+read: [docs/CONVENTIONS.md, docs/project.md]

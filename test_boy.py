@@ -12,13 +12,10 @@ from dotenv import load_dotenv
 from phoenix.otel import register
 from openinference.instrumentation.openai import OpenAIInstrumentor
 from openinference.instrumentation.crewai import CrewAIInstrumentor
-
-from obsidian_boy.crew_notes import NoteCrew
+from openinference.instrumentation.langchain import LangChainInstrumentor
 
 # Set the default vault path
 VAULT_PATH = Path(os.getenv('VAULT_PATH', './vault'))
-TEMP_DIR = Path('./temp')
-
 
 def main():
     # Load environment variables from .env file
@@ -28,15 +25,13 @@ def main():
     endpoint="http://localhost:6006/v1/traces"
     )
     # OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
-    from openinference.instrumentation.langchain import LangChainInstrumentor
     LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
-    CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
     
     # Initialize the file system interface
-    fs_interface = ObsidianInterface(vault_path=VAULT_PATH, temp_dir=TEMP_DIR)
+    obsidian_interface = ObsidianInterface(vault_path=VAULT_PATH)
 
     # Initialize the terminal interface
-    terminal_interface = TerminalInterface(fs_interface=fs_interface)
+    terminal_interface = TerminalInterface(obsidian_interface)
 
     # Initialize the daily note processor with the Anthropic Chat model
 
@@ -58,7 +53,6 @@ def main():
         temperature=0.0
     )
     daily_note_processor = DailyNoteProcessor(llm=llm)
-    note_crew = NoteCrew()
 
     # Display the menu and get user input
     terminal_interface.display_menu()
@@ -66,14 +60,13 @@ def main():
 
     # Process each selected note
     for note_path in selected_notes:
-        note_content = fs_interface.read_daily_note(note_path)
-        # entries = daily_note_processor.extract_entries(note_content)
-        entries = note_crew.extract_entries(note_path)
-        print(entries.entries)
+        note_content = obsidian_interface.read_daily_note(note_path)
+        entries = daily_note_processor.extract_entries(note_content)
+        print(entries)
 
         # Display the extracted entries
         print(f"\nEntries extracted from {note_path.name}:")
-        for entry in entries.entries:
+        for entry in entries:
             print(f"Title: {entry.title}")
             print(f"Link: {entry.link}")
             print(f"Description: {entry.description}")

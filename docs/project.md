@@ -34,20 +34,15 @@ repeat while (Notes in temp dir?) is (yes)
 end
 @enduml
 ```
-1. The terminal based interface allows the user to list and select daily notes to be processed.
-2. Extract the daily note entries into DailyNoteEntries.
-3. Loop over the entries.
-4. Create a new note into the new dir.
-5. If important fields of an entry are missing, try to fill the gaps with research:
-   1. Generate a title based on the contents of the url, the description and tags.
-   2. Find the link to main website based on the description, the tags and if needed a search for the title.
+- The terminal based interface allows the user to list and select daily notes to be processed.
+- Fill the missing fields:
+   1. Generate a title based on the description and the tags. If this is not possible, use the contents of the linked website
+   2. Find the link to main website by searching the web based on the title, description and tags.
    3. Create a description based on the contents of the linked website
-6. Match each new note to available note templates for different types of notes like tech-tool, business-idea, knowledge.
-7. The note writer inspects the assigned template and researches the knowledge needed to fill the note template using the research tools. Valuable researched knowledge is stored in the knowledge base and then writes the note based on the template using the researched knowledge.
-8. Tags new notes based on existing tags in the Obsidian vault
-9. Have the new notes reviewed by the human
+- The note writer inspects the assigned template and researches the knowledge needed to fill the note template using the research tools. Valuable researched knowledge is stored in the knowledge base and then writes the note based on the template using the researched knowledge.
+
 ## Tools and Types
-This a UML model for the tools and types. eThe types are sterotyped with <<Pydantic>>. 
+This a UML model for the tools and types. The types are sterotyped with <<Pydantic>>. 
 
 ```plantuml
 @startuml
@@ -73,6 +68,11 @@ class NoteReview <<Pydantic>> {
   +NoteStatus: result
   +str: feedback
 }
+class Template <<Pydantic>> {
+  +str: name
+  +Path: location
+  +str: description
+}
 class TerminalInterface {
   +show_menu()
   +show_daily_notes()
@@ -97,7 +97,7 @@ class DailyNoteTools {
 }
 class NoteTemplateTools {
   - Path: NOTE_TEMPLATE_DIR
-  +List[str]: get_templates()
+  +List[Template]: get_templates()
   +str: get_template(template_name: str)
 }
 class ResearchTools {
@@ -129,7 +129,7 @@ Provides a terminal-based interface for interacting with the ObsidianBoy system.
 #### DailyNoteTools
 Provides methods for extracting entries from a daily note.
 #### NoteTemplateTools
-Provides methods for listing and retrieving note templates. The name of a template describes the note type.
+Provides methods for listing and getting note templates.
 #### ResearchTools
 Provides methods for web search, AI search, and knowledgebase search. 
 - The web search performs a web search using a query and the result ususally conatains a list of websites and their descriptions. This is good to find websites related to a daily note or note. An agent can identify relevant results and then use the web scraper to get the content.
@@ -140,11 +140,15 @@ Responsible for scraping content from web resources to markdown.
 #### KnowledgeBase
 Abstract base class for knowledge storage and retrieval. It adds knowledge related to a given key. The delete function deletes all knowledge related to key. The ask function answers questions against the knowledge base of a given key.
 #### FileSystemKnowledgeBase
-Concrete implementation of KnowledgeBase that stores the knowledge in the file system. The stored knowledge for a key will be loaded into the context of a cheap LLM to answer question.
+Concrete implementation of KnowledgeBase that stores the knowledge in the file system. The stored knowledge for a key will be loaded into the context of a cheap LLM to answer the question.
 
-## Solution Proposals
-The solution is probably a mixture of fixed steps from the workflow while others may be better solved with an agentic approach. Probably LLM driven planning steps are beneficial. To be cost efficient the solution should use appropriate intelligent AI models for each step, ranging from simple and cheap models for easy tasks like summarization to more expensive capable models like planning. Probably memory should be added to the agents. All this has a huge impact on the technology choices. One candidate is to implement the solution with LangChain and LangGraph, the latter providing a graph based LLM control flow that allows a combination of single LLM executions and agent loops. Another contender is CrewAI, a multi-agent framework based on LangChain. CrewAI can be combined with LangGraph, crews could be executed by LangGraph nodes.
+## Solution
+The solution shall be implemented in Python with LangChain and LangGraph. The tools shall be implemented in descrete classes according to the UML model. An ObsidianBoy class shall contain the implementation of the workflow in LangGraph. Simple LangGraph nodes and nodes with agents. Both can use the provided tools. The code shall be put into the obsidian_boy module and tests go into the tests dir.
 
+To be cost effective the solution shall utilize 3 different capable LLMs: 
+- A simple and fast model to summarize texts, extract data from text, and perform simple tasks.
+- A medium model for avaerage agentic tasks
+- A smart model to perform complex tasks, planning and reasoning.
 
 ## Types and Templates
 ### The daily note entry type
@@ -156,7 +160,7 @@ class DailyNoteEntry(BaseModel):
     tags: List[str] = Field(default_factory=list, description="List of tags (optional, default to empty list)")
     todo: Optional[str] = Field(default=None, description="Optional todo item (null if not present)")
 ```
-Important fields that should be fileld if missing: title, link, description\
+Important fields that should be fileld if missing: title, link, description
 
 ### Note template example
 LLM hints for the content are in {{}}
